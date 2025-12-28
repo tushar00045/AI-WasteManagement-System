@@ -87,7 +87,7 @@ export default function CitizenReports() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Report Type
               </label>
-              <select
+              <select title="hello"
                 value={formData.report_type}
                 onChange={(e) =>
                   setFormData({

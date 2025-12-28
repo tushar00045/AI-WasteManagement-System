@@ -9,7 +9,6 @@ import Alerts from './pages/Alerts';
 import CitizenReports from './pages/CitizenReports';
 import AIInsights from './pages/AIInsights';
 import Admin from './pages/Admin';
-
 function App() {
   return (
     <BrowserRouter>
