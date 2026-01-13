@@ -3,8 +3,20 @@ import { Truck, MapPin, Clock, Fuel, DollarSign } from 'lucide-react';
 import { mockData } from '../lib/mockData';
 import { formatDistance, formatCurrency, getRouteStatusColor } from '../utils/helpers';
 import type { Route } from '../types';
+import { useNavigate } from "react-router-dom";
 
 export default function Routes() {
+  const navigate = useNavigate();
+  function startRoute(routeId: string) {
+    setRoutes(prev =>
+      prev.map(route =>
+        route.id === routeId
+          ? { ...route, status: "active" }
+          : route
+      )
+    );
+  }
+
   const [routes, setRoutes] = useState<Route[]>([]);
 
   useEffect(() => {
@@ -74,7 +86,11 @@ export default function Routes() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Active Routes</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {activeRoutes.map((route) => (
-                <RouteCard key={route.id} route={route} />
+                <RouteCard
+                    key={route.id}
+                    route={route}
+                    onTrack={(id) => navigate(`/map?routeId=${id}`)}
+                />
               ))}
             </div>
           </div>
@@ -85,7 +101,7 @@ export default function Routes() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Planned Routes</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {plannedRoutes.map((route) => (
-                <RouteCard key={route.id} route={route} />
+                <RouteCard key={route.id} route={route} onStart={startRoute}/>
               ))}
             </div>
           </div>
@@ -124,7 +140,15 @@ export default function Routes() {
   );
 }
 
-function RouteCard({ route }: { route: Route }) {
+function RouteCard({
+  route,
+  onStart,
+  onTrack,
+}: {
+  route: Route;
+  onStart?: (id: string) => void;
+  onTrack?: (id: string) => void;
+}) {
   const completionPercentage = route.total_bins > 0
     ? Math.round((route.bins_collected / route.total_bins) * 100)
     : 0;
@@ -201,13 +225,18 @@ function RouteCard({ route }: { route: Route }) {
       </div>
 
       {route.status === 'active' && (
-        <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+        <button 
+          onClick={() => onTrack?.(route.id)}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
           View Live Tracking
         </button>
       )}
 
-      {route.status === 'planned' && (
-        <button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
+      {route.status === "planned" && (
+        <button
+          onClick={() => onStart?.(route.id)}
+          className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+        >
           Start Route
         </button>
       )}
