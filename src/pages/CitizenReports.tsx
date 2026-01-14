@@ -19,6 +19,23 @@ export default function CitizenReports() {
   useEffect(() => {
     setReports(mockData.citizenReports);
   }, []);
+  
+  function startReview(reportId: string) {
+    setReports(prev =>
+      prev.map(r =>
+        r.id === reportId
+          ? { ...r, status: "under_review" }
+          : r
+      )
+    );
+  }
+  
+  function rejectReport(reportId: string) {
+    setReports(prev =>
+      prev.filter(r => r.id !== reportId)
+    );
+  }
+
 
   const submittedCount = reports.filter((r) => r.status === 'submitted').length;
   const underReviewCount = reports.filter((r) => r.status === 'under_review').length;
@@ -250,10 +267,17 @@ export default function CitizenReports() {
             </div>
             {report.status === 'submitted' && (
               <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200">
-                <button className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => startReview(report.id)}
+                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                >
                   Start Review
                 </button>
-                <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
+            
+                <button
+                  onClick={() => rejectReport(report.id)}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                >
                   Reject
                 </button>
               </div>

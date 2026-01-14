@@ -18,6 +18,16 @@ export default function BinMonitoring() {
   useEffect(() => {
     setBins(mockData.bins);
   }, []);
+  
+  function scheduleCollection(binId: string) {
+    setBins(prev =>
+      prev.map(bin =>
+        bin.id === binId
+          ? { ...bin, status: "scheduled" }
+          : bin
+      )
+    );
+  }
 
   const filteredBins = bins.filter((bin) => {
     const matchesSearch =
@@ -140,7 +150,8 @@ export default function BinMonitoring() {
             </div>
 
             {bin.status === 'requires_collection' && (
-              <button className="w-full mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+              <button className="w-full mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                      onClick={() => scheduleCollection(bin.id)} >
                 Schedule Collection
               </button>
             )}

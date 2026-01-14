@@ -54,29 +54,145 @@ export default function Admin() {
   );
 }
 
+type Worker = {
+  id: string;
+  name: string;
+  email: string;
+  zone: string;
+};
+
 function UserManagement() {
+  const [workers, setWorkers] = useState<Worker[]>([
+    { id: "1", name: "Worker 1", email: "worker1@waste-mgmt.city", zone: "North" },
+    { id: "2", name: "Worker 2", email: "worker2@waste-mgmt.city", zone: "South" },
+  ]);
+
+  const [form, setForm] = useState({ name: "", email: "", zone: "" });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  function addWorker() {
+    setWorkers(prev => [
+      ...prev,
+      { ...form, id: Date.now().toString() }
+    ]);
+    reset();
+  }
+
+  function startEdit(w: Worker) {
+    setEditingId(w.id);
+    setForm(w);
+    setShowForm(true);
+  }
+
+  function saveEdit() {
+    setWorkers(prev =>
+      prev.map(w =>
+        w.id === editingId ? { ...form, id: w.id } : w
+      )
+    );
+    reset();
+  }
+
+  function deleteWorker(id: string) {
+    setWorkers(prev => prev.filter(w => w.id !== id));
+  }
+
+  function reset() {
+    setForm({ name: "", email: "", zone: "" });
+    setEditingId(null);
+    setShowForm(false);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">Municipal Workers</h2>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+
+        <button
+          onClick={() => setShowForm(true)}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
           Add New User
         </button>
       </div>
 
+      {/* FORM */}
+      {showForm && (
+        <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+          <input
+            placeholder="Name"
+            value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            placeholder="Email"
+            value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            placeholder="Zone"
+            value={form.zone}
+            onChange={e => setForm({ ...form, zone: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+
+          <div className="flex gap-2">
+            {editingId ? (
+              <button
+                onClick={saveEdit}
+                className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={addWorker}
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Add
+              </button>
+            )}
+
+            <button
+              onClick={reset}
+              className="px-3 py-1 text-sm bg-gray-400 text-white rounded hover:bg-gray-500"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LIST (OLD STYLE PRESERVED) */}
       <div className="space-y-2">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        {workers.map((w) => (
+          <div
+            key={w.id}
+            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+          >
             <div>
-              <p className="font-medium text-gray-900">Worker {i}</p>
-              <p className="text-sm text-gray-600">worker{i}@waste-mgmt.city</p>
-              <p className="text-xs text-gray-500">Zone: {['North', 'South', 'East', 'West', 'Central'][i - 1]}</p>
+              <p className="font-medium text-gray-900">{w.name}</p>
+              <p className="text-sm text-gray-600">{w.email}</p>
+              <p className="text-xs text-gray-500">
+                Zone: {w.zone}
+              </p>
             </div>
+
             <div className="flex space-x-2">
-              <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+              <button
+                onClick={() => startEdit(w)}
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
                 Edit
               </button>
-              <button className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">
+
+              <button
+                onClick={() => deleteWorker(w.id)}
+                className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              >
                 Remove
               </button>
             </div>
@@ -125,37 +241,146 @@ function FleetManagement() {
   );
 }
 
+type BinItem = {
+  id: string;
+  bin_id: string;
+  location: string;
+  zone: string;
+};
+
 function BinManagement() {
+  const [bins, setBins] = useState<BinItem[]>([
+    { id: "1", bin_id: "BIN-101", location: "Market Road", zone: "North" },
+    { id: "2", bin_id: "BIN-102", location: "Bus Stand", zone: "South" },
+  ]);
+
+  const [form, setForm] = useState({ bin_id: "", location: "", zone: "" });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  function addBin() {
+    setBins(prev => [
+      ...prev,
+      { ...form, id: Date.now().toString() }
+    ]);
+    reset();
+  }
+
+  function startEdit(bin: BinItem) {
+    setEditingId(bin.id);
+    setForm(bin);
+    setShowForm(true);
+  }
+
+  function saveEdit() {
+    setBins(prev =>
+      prev.map(b =>
+        b.id === editingId ? { ...form, id: b.id } : b
+      )
+    );
+    reset();
+  }
+
+  function deleteBin(id: string) {
+    setBins(prev => prev.filter(b => b.id !== id));
+  }
+
+  function reset() {
+    setForm({ bin_id: "", location: "", zone: "" });
+    setEditingId(null);
+    setShowForm(false);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">Smart Bin Registry</h2>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-          Register New Bin
+        <h2 className="text-lg font-bold text-gray-900">Smart Bins</h2>
+
+        <button
+          onClick={() => setShowForm(true)}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          Add New Bin
         </button>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-900">
-          Use this panel to register new smart bins, update locations, or deactivate faulty bins.
-          Each bin must have a unique ID and GPS coordinates.
-        </p>
-      </div>
+      {/* FORM */}
+      {showForm && (
+        <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+          <input
+            placeholder="Bin ID"
+            value={form.bin_id}
+            onChange={e => setForm({ ...form, bin_id: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            placeholder="Location"
+            value={form.location}
+            onChange={e => setForm({ ...form, location: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            placeholder="Zone"
+            value={form.zone}
+            onChange={e => setForm({ ...form, zone: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
 
+          <div className="flex gap-2">
+            {editingId ? (
+              <button
+                onClick={saveEdit}
+                className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={addBin}
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Add
+              </button>
+            )}
+
+            <button
+              onClick={reset}
+              className="px-3 py-1 text-sm bg-gray-400 text-white rounded hover:bg-gray-500"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LIST (OLD STYLE PRESERVED) */}
       <div className="space-y-2">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        {bins.map((b) => (
+          <div
+            key={b.id}
+            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+          >
             <div>
-              <p className="font-medium text-gray-900">BIN-{String(i).padStart(4, '0')}</p>
-              <p className="text-sm text-gray-600">Location: Main Street & {i}th Avenue</p>
-              <p className="text-xs text-gray-500">Status: Operational | Zone: North</p>
+              <p className="font-medium text-gray-900">{b.bin_id}</p>
+              <p className="text-sm text-gray-600">{b.location}</p>
+              <p className="text-xs text-gray-500">
+                Zone: {b.zone}
+              </p>
             </div>
+
             <div className="flex space-x-2">
-              <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+              <button
+                onClick={() => startEdit(b)}
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
                 Edit
               </button>
-              <button className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">
-                Deactivate
+
+              <button
+                onClick={() => deleteBin(b.id)}
+                className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Remove
               </button>
             </div>
           </div>
@@ -165,37 +390,89 @@ function BinManagement() {
   );
 }
 
+type ZoneSchedule = {
+  zone: string;
+  days: string[];
+};
+
 function ScheduleManagement() {
-  const zones = ['North', 'South', 'East', 'West', 'Central'];
+  const [schedules, setSchedules] = useState<ZoneSchedule[]>([
+    { zone: "North", days: ["Mon", "Wed", "Fri"] },
+    { zone: "South", days: ["Tue", "Thu"] },
+    { zone: "East", days: ["Mon", "Thu"] },
+    { zone: "West", days: ["Wed", "Sat"] },
+    { zone: "Central", days: ["Tue", "Fri"] },
+  ]);
+
+  const [editingZone, setEditingZone] = useState<string | null>(null);
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  function toggleDay(zone: string, day: string) {
+    setSchedules(prev =>
+      prev.map(z =>
+        z.zone === zone
+          ? {
+              ...z,
+              days: z.days.includes(day)
+                ? z.days.filter(d => d !== day)
+                : [...z.days, day],
+            }
+          : z
+      )
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-gray-900">Collection Schedule Configuration</h2>
+      <h2 className="text-lg font-bold text-gray-900">
+        Collection Schedule Configuration
+      </h2>
 
       <div className="space-y-4">
-        {zones.map((zone) => (
-          <div key={zone} className="p-4 bg-gray-50 rounded-lg">
+        {schedules.map((z) => (
+          <div key={z.zone} className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-gray-900">{zone} Zone</h3>
-              <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
-                Edit Schedule
+              <h3 className="font-medium text-gray-900">{z.zone} Zone</h3>
+
+              <button
+                onClick={() =>
+                  setEditingZone(editingZone === z.zone ? null : z.zone)
+                }
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                {editingZone === z.zone ? "Done" : "Edit Schedule"}
               </button>
             </div>
+
             <div className="grid grid-cols-7 gap-2">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                <div
-                  key={day}
-                  className={`text-center p-2 rounded text-sm ${
-                    ['Mon', 'Wed', 'Fri'].includes(day)
-                      ? 'bg-green-100 text-green-700 font-medium'
-                      : 'bg-white text-gray-400'
-                  }`}
-                >
-                  {day}
-                </div>
-              ))}
+              {days.map((day) => {
+                const active = z.days.includes(day);
+
+                return (
+                  <div
+                    key={day}
+                    onClick={() =>
+                      editingZone === z.zone && toggleDay(z.zone, day)
+                    }
+                    className={`text-center p-2 rounded text-sm cursor-pointer ${
+                      active
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "bg-white text-gray-400"
+                    } ${
+                      editingZone === z.zone
+                        ? "hover:ring-2 hover:ring-blue-400"
+                        : "cursor-default"
+                    }`}
+                  >
+                    {day}
+                  </div>
+                );
+              })}
             </div>
-            <p className="text-xs text-gray-600 mt-2">Collection frequency: 3 times per week</p>
+
+            <p className="text-xs text-gray-600 mt-2">
+              Collection frequency: {z.days.length} times per week
+            </p>
           </div>
         ))}
       </div>
